@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interactive Travel Blog</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #e0f7fa, #ffffff);
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      max-width: 850px;
+      margin: 50px auto;
+      padding: 30px;
+      background: #ffffffdd;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      z-index: 1;
+    }
+
+    h1 {
+      text-align: center;
+      color: #00796b;
+      margin-bottom: 20px;
+      font-size: 2.2rem;
+    }
+
+    .button-wrapper {
+      text-align: center;
+      margin: 20px 0;
+      position: relative; /* important for initial button positioning */
+      height: 60px; /* to avoid container collapsing on button moving */
+    }
+
+    button {
+      background-color: #009688;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.3s;
+      position: relative; /* so we can switch to fixed dynamically */
+      z-index: 10;
+    }
+
+    button:hover {
+      /* no hover scale so user can't stay */
+    }
+
+    .hidden-text {
+      display: none;
+      margin-top: 15px;
+      color: #555;
+    }
+
+    iframe {
+      display: block;
+      margin: 30px auto;
+      max-width: 100%;
+      border-radius: 12px;
+      height: 400px;
+    }
+
+    ul, ol {
+      padding-left: 30px;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      text-align: center;
+      margin-top: 40px;
+      color: #e65100;
+    }
+
+    @media (max-width: 600px) {
+      iframe {
+        height: 240px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="container">
+  <h1><em>My Travel Blog</em></h1>
+  <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos ex hic earum possimus saepe in quaerat nisi dicta aliquam iste!</p>
+
+  <div class="button-wrapper">
+    <button id="readMoreBtn" onclick="showMore()">Read More!</button>
+    <div id="moreText" class="hidden-text">
+      This was my first solo travel experience, and it changed my life! I met people from different cultures and enjoyed amazing food and sunsets 🌅.
+    </div>
+  </div>
+
+  <span><b>What I Bought</b></span>
+  <ol>
+    <li>Mobile</li>
+    <li>PC</li>
+  </ol>
+
+  <span><strong>My Favourite Food</strong></span>
+  <ul>
+    <li>Biryani</li>
+    <li>Khichuri</li>
+    <li>Puri Singara</li>
+  </ul>
+
+  <h3>Biryani Making Guide!</h3>
+  <iframe src="https://www.youtube.com/embed/95BCU1n268w" title="Biryani Making Video" allowfullscreen></iframe>
+</div>
+
+<script>
+  function showMore() {
+    const text = document.getElementById("moreText");
+    text.style.display = text.style.display === "block" ? "none" : "block";
+  }
+
+  // Particle effect code - তোমার আগের মতোই
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  let particlesArray = [];
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  const mouse = {
+    x: undefined,
+    y: undefined
+  };
+
+  window.addEventListener('mousemove', function(e) {
+    mouse.x = e.x;
+    mouse.y = e.y;
+    for (let i = 0; i < 4; i++) {
+      particlesArray.push(new Particle());
+    }
+  });
+
+  class Particle {
+    constructor() {
+      this.x = mouse.x;
+      this.y = mouse.y;
+      this.size = Math.random() * 5 + 1;
+      this.speedX = (Math.random() - 0.5) * 3;
+      this.speedY = (Math.random() - 0.5) * 3;
+      this.color = `hsl(${Math.random() * 360}, 100%, 70%)`;
+    }
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      this.size *= 0.95;
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+    }
+  }
+
+  function handleParticles() {
+    for (let i = 0; i < particlesArray.length; i++) {
+      particlesArray[i].update();
+      particlesArray[i].draw();
+      if (particlesArray[i].size < 0.5) {
+        particlesArray.splice(i, 1);
+        i--;
+      }
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    handleParticles();
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+
+  // এখানে লুকোচুরি বাটনের স্ক্রিপ্ট
+
+  const btn = document.getElementById('readMoreBtn');
+
+  document.addEventListener('mousemove', (e) => {
+    const rect = btn.getBoundingClientRect();
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+
+    // বাটনের চারপাশে একটু buffer এলাকা
+    const buffer = 20;
+
+    const insideX = mouseX > rect.left - buffer && mouseX < rect.right + buffer;
+    const insideY = mouseY > rect.top - buffer && mouseY < rect.bottom + buffer;
+
+    if (insideX && insideY) {
+      // স্ক্রিন সাইজ নিয়ে নাও
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      // নতুন এলাকা নির্ধারণ (স্ক্রিনের মধ্যে যেকোন জায়গায়)
+      let newLeft = Math.random() * (viewportWidth - rect.width);
+      let newTop = Math.random() * (viewportHeight - rect.height);
+
+      // বাটনকে fixed করে অন্য জায়গায় পাঠাও
+      btn.style.position = 'fixed';
+      btn.style.left = `${newLeft}px`;
+      btn.style.top = `${newTop}px`;
+      btn.style.transition = 'left 0.3s ease, top 0.3s ease';
+    }
+  });
+
+  // উইন্ডো রিসাইজ হলে বাটনকে আসল অবস্থানে নিয়ে আসো
+  window.addEventListener('resize', () => {
+    btn.style.position = 'relative';
+    btn.style.left = 'auto';
+    btn.style.top = 'auto';
+    btn.style.transition = 'none';
+  });
+</script>
+
+</body>
+</html>
